@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Calculadora Científica Pro</title>
+    <style>
+        :root {
+            --poki-bg: #2a205d; --poki-dark: #1e1547; --accent: #6c5ce7;
+            --calc-bg: #000; --btn-gray: #333; --btn-orange: #ff9f0a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        body { background: #000; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
+
+        /* --- CALCULADORA --- */
+        #calc-view { width: 340px; background: #000; padding: 20px; border-radius: 40px; }
+        .top-bar { display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 10px; color: #fff; font-size: 13px; font-weight: bold; }
+        .switch { position: relative; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; inset: 0; background: #333; border-radius: 30px; transition: .4s; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background: white; border-radius: 50%; transition: .4s; }
+        input:checked + .slider { background: #30d158; }
+        input:checked + .slider:before { transform: translateX(20px); }
+        #display { width: 100%; height: 100px; background: transparent; color: white; text-align: right; font-size: 70px; font-weight: 200; border: none; outline: none; }
+        .grid-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        button { height: 72px; border: none; border-radius: 50%; font-size: 26px; color: white; cursor: pointer; background: var(--btn-gray); transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        button:active { filter: brightness(1.6); }
+        .op { background: var(--btn-orange); }
+        .fn { background: #a5a5a5; color: black; }
+
+        /* --- PORTAL --- */
+        #portal { display: none; position: fixed; inset: 0; background: var(--poki-bg); z-index: 1000; flex-direction: column; overflow-y: auto; }
+        header { background: var(--poki-dark); padding: 15px 40px; border-bottom: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1100; }
+        .game-grid { display: grid; padding: 25px; gap: 15px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); max-width: 1400px; margin: 0 auto; width: 100%; }
+        .card { background: #1a123d; border-radius: 18px; overflow: hidden; cursor: pointer; transition: 0.3s; border-bottom: 5px solid rgba(0,0,0,0.4); }
+        .card:hover { transform: scale(1.05); background: var(--accent); }
+        .card-img { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
+        .card-img svg { width: 50%; height: 50%; fill: white; }
+        .card p { padding: 10px; text-align: center; font-size: 11px; color: white; font-weight: 800; text-transform: uppercase; }
+
+        /* --- PLAYER --- */
+        #theater { display: none; position: fixed; inset: 0; background: #000; z-index: 2000; grid-template-columns: 220px 1fr 220px; }
+        .side { background: #0a0a0a; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+        .mini-card { width: 100%; aspect-ratio: 1; border-radius: 12px; cursor: pointer; background: #1a123d; display: flex; align-items: center; justify-content: center; }
+        .mini-card svg { width: 40%; height: 40%; fill: white; opacity: 0.5; }
+        iframe { width: 95%; height: 85vh; border-radius: 20px; border: none; background: #111; }
+        .exit-btn { position: absolute; top: 20px; right: 30px; background: #ff3b30; color: white; border: none; padding: 12px 24px; border-radius: 12px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div id="calc-view">
+        <div class="top-bar"><span>Code Mode</span><label class="switch"><input type="checkbox" id="mode"><span class="slider"></span></label></div>
+        <input type="text" id="display" readonly value="0">
+        <div class="grid-btns">
+            <button class="fn" onclick="c()">AC</button><button class="fn">+/-</button><button class="fn">%</button><button class="op">÷</button>
+            <button onclick="n('7')">7</button><button onclick="n('8')">8</button><button onclick="n('9')">9</button><button class="op">×</button>
+            <button onclick="n('4')">4</button><button onclick="n('5')">5</button><button onclick="n('6')">6</button><button class="op">-</button>
+            <button onclick="n('1')">1</button><button onclick="n('2')">2</button><button onclick="n('3')">3</button><button class="op">+</button>
+            <button onclick="n('0')" style="grid-column: span 2; border-radius: 40px; text-align: left; padding-left: 35px;">0</button>
+            <button onclick="n('.')">.</button><button class="op" onclick="check()">=</button>
+        </div>
+    </div>
+
+    <div id="portal">
+        <header><h1 style="color:white; font-size: 24px;">Science<span style="color:var(--accent)">trick</span></h1></header>
+        <div class="game-grid" id="main-grid"></div>
+    </div>
+
+    <div id="theater">
+        <button class="exit-btn" onclick="location.reload()">CERRAR</button>
+        <div class="side" id="l-side"></div>
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center;">
+            <h2 id="g-name" style="color:white; margin-bottom:15px; font-weight: 200;"></h2>
+            <iframe id="ifr" src=""></iframe>
+        </div>
+        <div class="side" id="r-side"></div>
+    </div>
+
+    <script>
+        let input = "";
+        const SVGS = {
+            play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
+            game: '<svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5zm3-3c-.8 0-1.5-.7-1.5-1.5S17.7 9 18.5 9s1.5.7 1.5 1.5-.7 1.5-1.5 1.5z"/></svg>',
+            star: '<svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>',
+            bolt: '<svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>'
+        };
+
+        const games = [
+            {n:"Subway Surfers", u:"https://deadshot.io", c:"#ff9f0a", i:SVGS.play},
+            {n:"Monkey Mart", u:"https://monkeymart.org", c:"#30d158", i:SVGS.game},
+            {n:"Slope 3D", u:"https://kdata1.com/2020/05/slope/", c:"#5856d6", i:SVGS.bolt},
+            {n:"Moto X3M", u:"https://moto-x3m.io", c:"#ff3b30", i:SVGS.bolt},
+            {n:"Tunnel Rush", u:"https://tunnelrush.com", c:"#af52de", i:SVGS.bolt},
+            {n:"1v1.LOL", u:"https://1v1.lol", c:"#007aff", i:SVGS.game},
+            {n:"Geometry Dash", u:"https://geometrydash.io", c:"#ffcc00", i:SVGS.star},
+            {n:"Retro Bowl", u:"https://game312.github.io/retro-bowl/", c:"#ff2d55", i:SVGS.star},
+            {n:"Drive Mad", u:"https://webgl.top/drive-mad/", c:"#30d158", i:SVGS.bolt},
+            {n:"Suika Game", u:"https://suikagame.com", c:"#ff9f0a", i:SVGS.game},
+            {n:"Vex 7", u:"https://webgl.top/vex-7/", c:"#007aff", i:SVGS.bolt},
+            {n:"Temple Run 2", u:"https://webgl.top/temple-run-2/", c:"#ffcc00", i:SVGS.play},
+            {n:"BitLife", u:"https://bitlifeonline.com", c:"#af52de", i:SVGS.game},
+            {n:"Paper.io 2", u:"https://paper-io.com", c:"#30d158", i:SVGS.star},
+            {n:"Shell Shockers", u:"https://shellshock.io", c:"#ff3b30", i:SVGS.bolt}
+        ];
+
+        function n(v) { 
+            input += v; 
+            document.getElementById('display').value = input; 
+            if(document.getElementById('mode').checked && input === "0000") unlock(); 
+        }
+        function c() { input = ""; document.getElementById('display').value = "0"; }
+        function check() { if(input === "0000") unlock(); else c(); }
+
+        function unlock() {
+            document.getElementById('calc-view').style.display = 'none';
+            document.getElementById('portal').style.display = 'flex';
+            document.body.style.background = "#2a205d";
+            const g = document.getElementById('main-grid');
+            g.innerHTML = "";
+            games.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<div class="card-img" style="background:linear-gradient(45deg, ${item.c}, #000)">${item.i}</div><p>${item.n}</p>`;
+                card.onclick = () => play(item.u, item.n);
+                g.appendChild(card);
+            });
+        }
+
+        function play(u, n) {
+            document.getElementById('theater').style.display = 'grid';
+            document.getElementById('ifr').src = u;
+            document.getElementById('g-name').innerText = n;
+            const l = document.getElementById('l-side'); const r = document.getElementById('r-side');
+            l.innerHTML = r.innerHTML = "";
+            for(let i=0; i<12; i++) {
+                let game = games[Math.floor(Math.random()*games.length)];
+                let div = document.createElement('div');
+                div.className = 'mini-card';
+                div.innerHTML = game.i;
+                div.onclick = () => play(game.u, game.n);
+                (i < 6 ? l : r).appendChild(div);
+            }
+        }
+    </script>
+</body>
+</html>
