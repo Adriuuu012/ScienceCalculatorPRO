@@ -9,7 +9,7 @@
             --poki-bg: #2a205d; --poki-dark: #1e1547; --accent: #6c5ce7;
             --calc-bg: #2c3e50; --btn-num: #34495e; --btn-op: #f39c12; --btn-c: #e74c3c;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, sans-serif; }
         body { background: #000; display: flex; align-items: center; justify-content: center; height: 100vh; overflow: hidden; }
 
         /* --- CALCULADORA --- */
@@ -19,7 +19,7 @@
         #display { 
             width: 100%; height: 80px; background: #bdc3c7; color: #2c3e50; 
             text-align: right; font-size: 45px; border: 5px solid #7f8c8d; border-radius: 10px; 
-            margin-bottom: 20px; padding: 10px; outline: none;
+            margin-bottom: 20px; padding: 10px; outline: none; letter-spacing: 2px;
         }
 
         .grid-btns { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
@@ -40,16 +40,16 @@
         .card:hover { transform: scale(1.05); background: var(--accent); }
         .card-img { width: 100%; aspect-ratio: 1; display: flex; align-items: center; justify-content: center; }
         .card-img svg { width: 45%; height: 45%; fill: white; }
-        .card p { padding: 10px; font-size: 11px; color: white; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card p { padding: 10px; font-size: 11px; color: white; font-weight: 800; text-transform: uppercase; white-space: nowrap; }
 
-        /* --- CONTENEDOR PLAYER --- */
+        /* --- PLAYER --- */
         #theater { display: none; position: fixed; inset: 0; background: #000; z-index: 2000; grid-template-columns: 200px 1fr 200px; }
         .side { background: #0a0a0a; padding: 15px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
         .mini-card { width: 100%; aspect-ratio: 1; border-radius: 12px; cursor: pointer; background: #1a123d; display: flex; align-items: center; justify-content: center; }
         .mini-card svg { width: 40%; height: 40%; fill: white; opacity: 0.4; }
-        .main-stage { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; }
-        iframe { width: 95%; height: 82vh; border-radius: 16px; border: none; background: #111; box-shadow: 0 0 40px rgba(108, 92, 231, 0.3); }
-        .exit-btn { position: absolute; top: 15px; right: 2.5%; background: #ff3b30; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; z-index: 2100; }
+        .main-stage { display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; width: 100%; height: 100%; padding: 20px;}
+        iframe { width: 100%; height: 90vh; border-radius: 16px; border: none; background: #111; box-shadow: 0 0 40px rgba(108, 92, 231, 0.3); }
+        .exit-btn { position: absolute; top: 10px; right: 20px; background: #ff3b30; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; z-index: 2100; }
     </style>
 </head>
 <body>
@@ -74,7 +74,7 @@
     <div id="portal">
         <header>
             <h1 style="color:white; font-size: 22px;">Science<span style="color:var(--accent)">trick</span> PRO</h1>
-            <div style="color: #30d158; font-size: 11px; font-weight: bold; letter-spacing: 1px;">SISTEMA VERIFICADO</div>
+            <div style="color: #30d158; font-size: 11px; font-weight: bold; letter-spacing: 1px;">SISTEMA ESTABLE</div>
         </header>
         <div class="game-grid" id="main-grid"></div>
     </div>
@@ -83,7 +83,7 @@
         <button class="exit-btn" onclick="closeGame()">VOLVER</button>
         <div class="side" id="l-side"></div>
         <div class="main-stage">
-            <h2 id="g-name" style="color:white; margin-bottom:15px; font-weight: 300; letter-spacing: 1px;"></h2>
+            <h2 id="g-name" style="color:white; margin-bottom:10px; font-weight: 300; letter-spacing: 1px;"></h2>
             <iframe id="ifr" src="" allowfullscreen></iframe>
         </div>
         <div class="side" id="r-side"></div>
@@ -95,45 +95,47 @@
         const SVGS = {
             play: '<svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>',
             game: '<svg viewBox="0 0 24 24"><path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.8 0-1.5-.7-1.5-1.5s.7-1.5 1.5-1.5 1.5.7 1.5 1.5-.7 1.5-1.5 1.5z"/></svg>',
-            bolt: '<svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>',
-            target: '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.5 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/></svg>'
+            bolt: '<svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></svg>'
         };
 
+        // Enlaces 100% compatibles con iframes basados en repositorios de GitHub y webGL abiertos
         const games = [
-            {n:"Subway Surfers", u:"https://looloo.wtf/subway-surfers/", c:"#ff9f0a", i:SVGS.play},
-            {n:"1v1.LOL", u:"https://1v1.lol/", c:"#007aff", i:SVGS.game},
-            {n:"Slope 3D", u:"https://mathisfun.github.io/slope/", c:"#5856d6", i:SVGS.bolt},
-            {n:"Moto X3M", u:"https://images-opensocial.googleusercontent.com/gadgets/ifr?url=https://cdn.jsdelivr.net/gh/r976/83m@main/m3.xml", c:"#ff3b30", i:SVGS.bolt},
-            {n:"Geometry Dash", u:"https://769792442-841961623157929910.preview.editmysite.com/uploads/b/139890129-195977926107077583/files/gd.html", c:"#ffcc00", i:SVGS.target},
-            {n:"Tunnel Rush", u:"https://subwaysurfersgame.github.io/tunnel-rush/", c:"#af52de", i:SVGS.bolt},
-            {n:"Retro Bowl", u:"https://game312.github.io/retro-bowl/", c:"#ff2d55", i:SVGS.play},
-            {n:"Drive Mad", u:"https://webgl.top/drive-mad/", c:"#30d158", i:SVGS.bolt},
-            {n:"Suika Game", u:"https://suikagame.com/", c:"#ff9f0a", i:SVGS.game},
-            {n:"Smash Karts", u:"https://smashkarts.io/", c:"#007aff", i:SVGS.game},
-            {n:"Eaglercraft (Minecraft)", u:"https://eaglercraft.com/mc/1.8.8/", c:"#5856d6", i:SVGS.game},
-            {n:"Vex 7", u:"https://webgl.top/vex-7/", c:"#ff3b30", i:SVGS.bolt},
-            {n:"Run 3", u:"https://mathisfun.github.io/run3/", c:"#af52de", i:SVGS.target},
-            {n:"Cookie Clicker", u:"https://orteil.dashnet.org/cookieclicker/", c:"#ffcc00", i:SVGS.game},
-            {n:"Shell Shockers", u:"https://shellshock.io/", c:"#ff2d55", i:SVGS.bolt},
-            {n:"Temple Run 2", u:"https://webgl.top/temple-run-2/", c:"#30d158", i:SVGS.play}
+            {n:"Subway Surfers", u:"https://macvg.github.io/subway-surfers/", c:"#ff9f0a", i:SVGS.play},
+            {n:"Slope", u:"https://macvg.github.io/slope/", c:"#5856d6", i:SVGS.bolt},
+            {n:"Retro Bowl", u:"https://macvg.github.io/retro-bowl/", c:"#ff2d55", i:SVGS.play},
+            {n:"Moto X3M", u:"https://macvg.github.io/moto-x3m/", c:"#ff3b30", i:SVGS.bolt},
+            {n:"Geometry Dash", u:"https://macvg.github.io/geometry-dash/", c:"#ffcc00", i:SVGS.play},
+            {n:"Run 3", u:"https://macvg.github.io/run-3/", c:"#007aff", i:SVGS.bolt},
+            {n:"Tunnel Rush", u:"https://macvg.github.io/tunnel-rush/", c:"#af52de", i:SVGS.bolt},
+            {n:"Drive Mad", u:"https://macvg.github.io/drive-mad/", c:"#30d158", i:SVGS.game},
+            {n:"Monkey Mart", u:"https://macvg.github.io/monkey-mart/", c:"#30d158", i:SVGS.game},
+            {n:"Smash Karts", u:"https://macvg.github.io/smash-karts/", c:"#007aff", i:SVGS.game},
+            {n:"Cookie Clicker", u:"https://macvg.github.io/cookie-clicker/", c:"#ffcc00", i:SVGS.play},
+            {n:"BitLife", u:"https://macvg.github.io/bitlife/", c:"#5856d6", i:SVGS.game}
         ];
 
+        // LÓGICA DE LA CALCULADORA (ARREGLADA)
         function n(v) { 
-            if(input === "0") input = "";
             input += v; 
             document.getElementById('display').value = input; 
-            
-            // Si detecta 0000 abre al instante sin esperar al igual
             if(input === "0000") unlock(); 
         }
         
-        function c() { input = "0"; document.getElementById('display').value = "0"; }
+        function c() { 
+            input = ""; 
+            document.getElementById('display').value = "0"; 
+        }
         
         function check() { 
-            if(input === "0000" || input === "0.000") unlock(); 
-            else c(); 
+            if(input === "0000") unlock(); 
+            else {
+                // Simular cálculo rápido para despistar
+                document.getElementById('display').value = "Error";
+                setTimeout(c, 1000);
+            }
         }
 
+        // APERTURA DEL PORTAL
         function unlock() {
             document.getElementById('calc-view').style.display = 'none';
             document.getElementById('portal').style.display = 'flex';
@@ -151,6 +153,7 @@
             });
         }
 
+        // CARGA DEL JUEGO
         function play(u, n) {
             document.getElementById('theater').style.display = 'grid';
             document.getElementById('ifr').src = u;
@@ -166,12 +169,12 @@
                 let div = document.createElement('div');
                 div.className = 'mini-card';
                 div.innerHTML = shuffled[i].i;
-                div.style.borderLeft = `4px solid ${shuffled[i].c}`;
                 div.onclick = () => play(shuffled[i].u, shuffled[i].n);
                 (i < 4 ? l : r).appendChild(div);
             }
         }
 
+        // CERRAR JUEGO (Vacía el iframe para que no de lag)
         function closeGame() {
             document.getElementById('theater').style.display = 'none';
             document.getElementById('ifr').src = ""; 
